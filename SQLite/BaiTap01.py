@@ -58,5 +58,20 @@ for p in all_products:
     print(f"{p[0]:<4} | {p[1]:<20} | {p[2]:<10} | {p[3]:<10}")
 
 # 3.3 UPDATE
+sql_update = """
+UPDATE products
+SET price = ?, quantity = ?
+WHERE id = ?
+"""
+
+cursor.execute(sql_update, (899.99, 12, 1))  
+conn.commit()
+print(" Đã cập nhật dữ liệu thành công!")
+
 
 # 3.4 DELETE
+sql_delete = "DELETE FROM products WHERE id = ?"
+
+cursor.execute(sql_delete, (2,))  
+conn.commit()
+print(" Đã xóa dữ liệu thành công!")

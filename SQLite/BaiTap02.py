@@ -87,7 +87,7 @@ print("\n--- Bắt đầu Cào và Lưu Trữ Tức thời ---")
 
 count = 0
 for link in all_links:
-    if count >= 30:   # giới hạn 10 painter để test
+    if count >= 10:   # giới hạn 10 painter để test
         break
     count += 1
 
@@ -149,8 +149,87 @@ for link in all_links:
 
 print("\nHoàn tất quá trình cào và lưu dữ liệu tức thời.")
 
+
 ######################################################
-## IV. Đóng kết nối
+## IV. Truy vấn SQLite
+######################################################
+
+print("\n=== A. Thống Kê và Toàn Cục ===")
+
+# 1. Đếm tổng số họa sĩ
+cursor.execute("SELECT COUNT(*) FROM painters_info")
+print("1. Tổng số họa sĩ:", cursor.fetchone()[0])
+
+# 2. Hiển thị 5 dòng dữ liệu đầu tiên
+print("\n2. 5 dòng dữ liệu đầu tiên:")
+cursor.execute("SELECT * FROM painters_info LIMIT 5")
+for row in cursor.fetchall():
+    print(row)
+
+# 3. Liệt kê danh sách quốc tịch duy nhất
+print("\n3. Danh sách quốc tịch duy nhất:")
+cursor.execute("SELECT DISTINCT nationality FROM painters_info")
+for row in cursor.fetchall():
+    print(row[0])
+
+print("\n=== B. Lọc và Tìm Kiếm ===")
+
+# 4. Họa sĩ có tên bắt đầu bằng 'F'
+print("\n4. Họa sĩ có tên bắt đầu bằng 'F':")
+cursor.execute("SELECT name FROM painters_info WHERE name LIKE 'F%'")
+for row in cursor.fetchall():
+    print(row[0])
+
+# 5. Họa sĩ có quốc tịch chứa 'French'
+print("\n5. Họa sĩ có quốc tịch chứa 'French':")
+cursor.execute("SELECT name, nationality FROM painters_info WHERE nationality LIKE '%French%'")
+for row in cursor.fetchall():
+    print(row)
+
+# 6. Họa sĩ không có thông tin quốc tịch
+print("\n6. Họa sĩ không có thông tin quốc tịch:")
+cursor.execute("SELECT name FROM painters_info WHERE nationality IS NULL OR nationality = ''")
+for row in cursor.fetchall():
+    print(row[0])
+
+# 7. Họa sĩ có cả ngày sinh và ngày mất
+print("\n7. Họa sĩ có cả ngày sinh và ngày mất:")
+cursor.execute("""
+SELECT name FROM painters_info
+WHERE birth IS NOT NULL AND birth <> ''
+  AND death IS NOT NULL AND death <> ''
+""")
+for row in cursor.fetchall():
+    print(row[0])
+
+# 8. Họa sĩ có tên chứa 'Fales'
+print("\n8. Họa sĩ có tên chứa 'Fales':")
+cursor.execute("SELECT * FROM painters_info WHERE name LIKE '%Fales%'")
+for row in cursor.fetchall():
+    print(row)
+
+print("\n=== C. Nhóm và Sắp Xếp ===")
+
+# 9. Sắp xếp tên họa sĩ theo thứ tự A-Z
+print("\n9. Danh sách họa sĩ theo thứ tự A-Z:")
+cursor.execute("SELECT name FROM painters_info ORDER BY name ASC")
+for row in cursor.fetchall():
+    print(row[0])
+
+# 10. Nhóm và đếm số lượng họa sĩ theo từng quốc tịch
+print("\n10. Số lượng họa sĩ theo từng quốc tịch:")
+cursor.execute("""
+SELECT nationality, COUNT(*) AS count_painters
+FROM painters_info
+GROUP BY nationality
+ORDER BY count_painters DESC
+""")
+for row in cursor.fetchall():
+    print(row)
+
+
+######################################################
+## V. Đóng kết nối
 ######################################################
 
 driver.quit()
